@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-//git submodule add https://github.com/progschj/ThreadPool.git
-#include "ThreadPool/ThreadPool.h"
-
 int someExample();
 int someExampleParallel();
 
@@ -33,27 +30,28 @@ int someExample() {
     return result;
 }
 
+#include <omp.h>
 int someExampleParallel() {
-    ThreadPool pool(8);
-
-    auto futureValue1 = pool.enqueue([](){
-        int value1;
-        //code to evaluate value1
-        //may require significant ammount of time
-        value1 = 3;
-        return value1;
-    });
-
-    auto futureValue2 = pool.enqueue([](){
-        int value2;
-        //code to evaluate value2
-        //may require significant ammount of time
-        value2 = 3;
-        return value2;
-    });
+    int value1;
+    int value2;
+#pragma omp parallel sections
+    {
+#pragma omp section
+        {
+            //code to evaluate value1
+            //may require significant ammount of time
+            value1 = 3;
+        }
+#pragma omp section
+        {
+            //code to evaluate value2
+            //may require significant ammount of time
+            value2 = 3;
+        }
+    }//here we wait for all blocks
 
     //Now use some fancy algorythm using values
-    int result = futureValue1.get() + futureValue2.get();
+    int result = value1 + value2;
     assert(result == 6);
 
     return result;
