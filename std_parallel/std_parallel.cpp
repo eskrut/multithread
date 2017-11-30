@@ -46,23 +46,23 @@ int main(int argc, char**argv) {
         size_t max;
         sw.start();
         max = *std::max_element(vecToSort.begin(), vecToSort.end());
-        std::cout << sw.stop() << std::endl;
+        std::cout << "max_element seq " << sw.stop() << std::endl;
 
         size_t max2;
         sw.start();
         max2 = *std::__parallel::max_element(vecToSort2.begin(), vecToSort2.end());
-        std::cout << sw.stop() << std::endl;
+        std::cout << "max_element par " << sw.stop() << std::endl;
 
         if(max != length-1) throw std::runtime_error("Cant evaluete max with sequential max_element");
         if(max2 != length-1) throw std::runtime_error("Cant evaluete max with parallel max_element");
 
         sw.start();
         std::sort(vecToSort.begin(), vecToSort.end());
-        std::cout << sw.stop() << std::endl;
+        std::cout << "sort seq " << sw.stop() << std::endl;
 
         sw.start();
         std::__parallel::sort(vecToSort2.begin(), vecToSort2.end());
-        std::cout << sw.stop() << std::endl;
+        std::cout << "sort par " << sw.stop() << std::endl;
 
         for(size_t ct = 0; ct < length; ++ct)
             if( vecToSort[ct] != ct ) throw std::runtime_error("Cant sort in sequential mode");
@@ -72,7 +72,7 @@ int main(int argc, char**argv) {
 
     {
         const size_t lengthData = 25000;
-        const size_t lengthVector = 6 /*Gb*/
+        const size_t lengthVector = 4 /*Gb*/
                 * 1024ull /*Mb*/
                 * 1024 /*Kb*/
                 * 1024 /*b*/
@@ -100,7 +100,7 @@ int main(int argc, char**argv) {
             maxes[index] = *std::max_element(vec.begin(), vec.end());
         }
         );
-        std::cout << sw.stop() << std::endl;
+        std::cout << "for_each seq " << sw.stop() << std::endl;
 
         std::vector<size_t> maxes2(lengthData, 0);
         sw.start();
@@ -112,8 +112,7 @@ int main(int argc, char**argv) {
             maxes2[index] = *std::max_element(vec.begin(), vec.end());
         }
         );
-        std::cout << sw.stop() << std::endl;
-
+        std::cout << "for_each par " << sw.stop() << std::endl;
     }
     return 0;
 }
